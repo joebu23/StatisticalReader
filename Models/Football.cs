@@ -3,104 +3,72 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StatisticalReader.Extensions;
 
 namespace StatisticalReader.Models
 {
     public class Football
     {
-        public class Offense
+        // offense
+        // rushing
+        public List<int> ListRushAtt { get; set; }
+
+        public int RushTd { get; set; }
+        public int Fumbles { get; set; }
+
+        public double RushAvg
         {
-            // offense
-            // rushing
-            int RushAttempts { get; set; }
-            int RushYards { get; set; }
-            List<int> RushAtt { get; set; }
-
-            int RushTd { get; set; }
-            int Fumbles { get; set; }
-
-            double RushAvg
+            get
             {
-                get
-                {
-                    return Mean(RushAtt);
-                }
+                return ListRushAtt.Mean();
             }
+        }
 
-            double RushVariance
+        public double RushVariance
+        {
+            get
             {
-                get
-                {
-                    return Variance(RushAtt, SumOfSquares(RushAtt));
-                }
+                return ListRushAtt.Variance();
             }
+        }
 
-            double RushStandardDeviation
-            { // this finds population standard deviation, as it should
-                get
-                {
-                    return StandardDeviation(SumOfSquares(RushAtt), RushAtt.Count);
-                }
-            }
-
-            double RushMinStandardDeviation
+        public double RushStandardDeviation
+        { 
+            get
             {
-                get
-                {
-                    return this.RushAvg - this.RushStandardDeviation;
-                }
+                return ListRushAtt.StandardDeviation();
             }
+        }
 
-            double RushMaxStandardDeviation
+        public double RushMinStandardDeviation
+        {
+            get
             {
-                get
-                {
-                    return this.RushAvg + this.RushStandardDeviation;
-                }
+                return this.RushAvg - this.RushStandardDeviation;
             }
+        }
 
-
-            // passing
-            int PassCompletions { get; set; }
-            int PassAttempts { get; set; }
-            int PassYards { get; set; }
-            int PassTd { get; set; }
-            int PassInt { get; set; }
-
-            int OffenseTurnovers
+        public double RushMaxStandardDeviation
+        {
+            get
             {
-                get
-                {
-                    return this.Fumbles + this.PassInt;
-                }
+                return this.RushAvg + this.RushStandardDeviation;
             }
         }
 
-        public class Defense
-        {
-            // not implemented yet
-        }
+        // passing
+        public int PassCompletions { get; set; }
+        public int PassAttempts { get; set; }
+        public int PassYards { get; set; }
+        public int PassTd { get; set; }
+        public int PassInt { get; set; }
 
-        #region ## Calculators
-        private static double Mean(this List<int> values)
+        public int Turnovers
         {
-            return values.Sum() / values.Count;
+            get
+            {
+                return this.Fumbles + this.PassInt;
+            }
         }
-
-        private static int SumOfSquares(this List<int> values)
-        {
-            return values.Sum();
-        }
-
-        private static double Variance(this List<int> values, this int sumOfSquares)
-        {
-            return sumOfSquares / (values.Count - 1);
-        }
-
-        private static double StandardDeviation(this int sumOfSquares, this int count)
-        {
-            return Math.Sqrt(sumOfSquares / count);
-        }
-        #endregion
     }
 }
