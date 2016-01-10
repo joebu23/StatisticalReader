@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\MathCalculations.cs" />
-    <Compile Include="Models\Football.cs" />
+    <Compile Include="Models\GameStats.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\StatReader.cs" />

@@ -10,12 +10,12 @@ namespace StatisticalReader.Extensions
     {
         public static double Mean(this List<int> values)
         {
-            return values.Sum() / values.Count;
-        }
-
-        public static int SumOfSquares(this List<int> values)
-        {
-            return values.Sum();
+            double sum = 0;
+            foreach(var value in values)
+            {
+                sum += value;
+            }
+            return sum / values.Count;
         }
 
         public static double Variance(this List<int> values)
