@@ -24,6 +24,8 @@ namespace StatisticalReader.Services
 
         public string ReadInGame()
         {
+            var returnString = "";
+
             var homeOffense = InitializeGameModel();
             var homeDefense = InitializeGameModel();
             var awayOffense = InitializeGameModel();
@@ -67,16 +69,19 @@ namespace StatisticalReader.Services
 
                 if (playType == "rush")
                 {
+                    returnString += "Rushing: " + playYardage;
                     if (awayPlay)
                     {
                         awayOffense.RushingStats.ListRushAtt.Add(playYardage);
                         if (touchdown)
                         {
                             awayOffense.RushingStats.RushTd++;
+                            returnString += " and a touchdown \n";
                         }
                         if (fumble)
                         {
                             awayOffense.RushingStats.Fumbles++;
+                            returnString += " and a fumble \n";
                         }
                     }
                     if (homePlay)
@@ -85,37 +90,45 @@ namespace StatisticalReader.Services
                         if (touchdown)
                         {
                             homeOffense.RushingStats.RushTd++;
+                            returnString += " and a touchdown \n";
                         }
                         if (fumble)
                         {
                             homeOffense.RushingStats.Fumbles++;
+                            returnString += " and a fumble \n";
                         }
                     }
                 }
 
                 if(playType == "pass")
                 {
+                    returnString += "Passing Play: ";
                     if(awayPlay)
                     {
                         if (statLine.Contains(" complete"))
                         {
+                            returnString += " Complete for " + playYardage + " yards";
                             awayOffense.PassingStats.CompletedPasses.Add(playYardage);
                             awayOffense.PassingStats.PassAttempts++;
                             if (statLine.Contains("touchdown"))
                             {
+                                returnString += " and a touchdown \n";
                                 awayOffense.PassingStats.PassTd++;
                             }
                         }
                         else
                         {
+                            returnString += " incomplete ";
                             awayOffense.PassingStats.PassAttempts++;
                             if (statLine.Contains(" is intercepted by "))
                             {
+                                returnString += " and intercepted \n";
                                 awayOffense.PassingStats.PassInt++;
                             }
                         }
                         if(fumble)
                         {
+                            returnString += " and a fumble \n";
                             awayOffense.RushingStats.Fumbles++;
                         }
                     }
@@ -123,10 +136,12 @@ namespace StatisticalReader.Services
                     {
                         if (statLine.Contains(" complete"))
                         {
+                            returnString += " Complete for " + playYardage + " yards";
                             homeOffense.PassingStats.CompletedPasses.Add(playYardage);
                             homeOffense.PassingStats.PassAttempts++;
                             if (statLine.Contains("touchdown"))
                             {
+                                returnString += " and a touchdown \n";
                                 homeOffense.PassingStats.PassTd++;
                             }
                         }
@@ -135,11 +150,13 @@ namespace StatisticalReader.Services
                             homeOffense.PassingStats.PassAttempts++;
                             if (statLine.Contains(" is intercepted by "))
                             {
+                                returnString += " and intercepted \n";
                                 homeOffense.PassingStats.PassInt++;
                             }
                         }
                         if (fumble)
                         {
+                            returnString += " and a fumble \n";
                             homeOffense.RushingStats.Fumbles++;
                         }
                     }
@@ -147,12 +164,14 @@ namespace StatisticalReader.Services
 
                 if(playType == "other")
                 {
-                    var x = 1;
+                    returnString += "Other play: " + statLine;
+
                 }
+                returnString += "\n";
             }
 
-            var returnString = "";
-            returnString = "Away Passing: " + awayOffense.PassingStats.CompletedPasses.Count + "-" + awayOffense.PassingStats.PassAttempts + " for " + awayOffense.PassingStats.CompletedPasses.Sum() + " yards, " + awayOffense.PassingStats.PassTd + " TD, " + awayOffense.PassingStats.PassInt + " Int.\n";
+            
+            returnString += "Away Passing: " + awayOffense.PassingStats.CompletedPasses.Count + "-" + awayOffense.PassingStats.PassAttempts + " for " + awayOffense.PassingStats.CompletedPasses.Sum() + " yards, " + awayOffense.PassingStats.PassTd + " TD, " + awayOffense.PassingStats.PassInt + " Int.\n";
             returnString += "Home Passing: " + homeOffense.PassingStats.CompletedPasses.Count + "-" + homeOffense.PassingStats.PassAttempts + " for " + homeOffense.PassingStats.CompletedPasses.Sum() + " yards, " + homeOffense.PassingStats.PassTd + " TD, " + homeOffense.PassingStats.PassInt + " Int.\n";
             returnString += "Away Rushing: " + awayOffense.RushingStats.ListRushAtt.Count + "-" + awayOffense.RushingStats.ListRushAtt.Sum() + " " + awayOffense.RushingStats.RushTd + " TD \n";
             returnString += "Home Rushing: " + homeOffense.RushingStats.ListRushAtt.Count + "-" + homeOffense.RushingStats.ListRushAtt.Sum() + " " + homeOffense.RushingStats.RushTd + " TD \n";
@@ -172,7 +191,7 @@ namespace StatisticalReader.Services
 
             if (statLine.Contains(" left tackle for ") || statLine.Contains(" middle for ") || statLine.Contains(" right tackle for ") ||
                 statLine.Contains(" left end for ") || statLine.Contains(" right end for ") || statLine.Contains(" for no gain") ||
-                statLine.Contains(" left guard for ") || statLine.Contains(" right guard for "))
+                statLine.Contains(" left guard for ") || statLine.Contains(" right guard for ") || statLine.Contains(" kneels for"))
             {
                 return "rush";
             }
@@ -183,11 +202,12 @@ namespace StatisticalReader.Services
         private int GetStatValue(string statLine)
         {
             var yardage = 0;
-            try
+            if(statLine.Contains(" for ") && statLine.Contains(" yard"))
             {
-                yardage = Convert.ToInt32(Regex.Match(statLine, @"\d+").Value);
+                var cutoffLine = statLine.Split(new string[] { " yard" }, StringSplitOptions.None);
+                yardage = Convert.ToInt32(Regex.Match(cutoffLine[0], @"[-]?\d+(?:\d+)?").Value);
             }
-            catch(FormatException er)
+            if (statLine.Contains("for no gain"))
             {
                 yardage = 0;
             }
