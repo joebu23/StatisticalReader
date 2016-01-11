@@ -11,7 +11,7 @@ namespace StatisticalReader
     {
         static void Main(string[] args)
         {
-            var statReader = new StatReader(@"C:\Users\Administrator\Desktop\detATsd.csv", "SDG", "DET");
+            var statReader = new StatReader(@"C:\Users\Administrator\Desktop\dalATnyg.csv");
             var stats = statReader.ReadInGame();
             Console.WriteLine(stats);
             var x = 1;

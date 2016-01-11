@@ -12,14 +12,10 @@ namespace StatisticalReader.Services
     public class StatReader
     {
         private StreamReader _fileReader;
-        private string _homeTeam;
-        private string _awayTeam;
 
-        public StatReader(string fileLocation, string homeTeam, string awayTeam)
+        public StatReader(string fileLocation)
         {
             _fileReader = new StreamReader(File.OpenRead(fileLocation));
-            _homeTeam = homeTeam;
-            _awayTeam = awayTeam;
         }
 
         public string ReadInGame()
